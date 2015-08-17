@@ -53,41 +53,6 @@ public class BillingActivity extends SherlockFragmentActivity {
 		}
 
 		mBillingController = SurespotApplication.getBillingController();
-		mBillingResponseHandler = new IAsyncCallback<Integer>() {
-
-			@Override
-			public void handleResponse(Integer response) {
-				hideProgress();
-				ViewGroup layout = null;
-
-				switch (response) {
-				case BillingController.BILLING_QUERYING_INVENTORY:
-					Utils.makeToast(BillingActivity.this, getString(R.string.billing_getting_inventory));
-
-					break;
-				case IabHelper.BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE:
-					Utils.makeToast(BillingActivity.this, getString(R.string.billing_unavailable_title));
-					layout = (ViewGroup) BillingActivity.this.findViewById(R.id.inAppButtons1);
-					UIUtils.disableImmediateChildren(layout);
-					layout = (ViewGroup) BillingActivity.this.findViewById(R.id.inAppButtons2);
-					UIUtils.disableImmediateChildren(layout);
-
-					break;
-				case IabHelper.BILLING_RESPONSE_RESULT_ERROR:
-				case IabHelper.BILLING_RESPONSE_RESULT_DEVELOPER_ERROR:
-					Utils.makeToast(BillingActivity.this, getString(R.string.billing_error));
-
-					layout = (ViewGroup) BillingActivity.this.findViewById(R.id.inAppButtons1);
-					UIUtils.disableImmediateChildren(layout);
-					layout = (ViewGroup) BillingActivity.this.findViewById(R.id.inAppButtons2);
-					UIUtils.disableImmediateChildren(layout);
-
-					break;
-
-				}
-
-			}
-		};
 
 		showProgress();
 		mBillingController.setup(getApplicationContext(), false, mBillingResponseHandler);
