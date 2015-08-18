@@ -10,7 +10,8 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.ClipboardManager;
+import android.content.ClipboardManager;
+import android.content.ClipData;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -32,9 +33,6 @@ import com.twofours.surespot.ui.UIUtils;
 public class BillingActivity extends SherlockFragmentActivity {
 
 	protected static final String TAG = "BillingActivity";
-
-	private BillingController mBillingController;
-	private IAsyncCallback<Integer> mBillingResponseHandler;
 	private ImageView mHomeImageView;
 	private AlertDialog mDialog;
 
@@ -52,10 +50,9 @@ public class BillingActivity extends SherlockFragmentActivity {
 			mHomeImageView = (ImageView) findViewById(R.id.abs__home);
 		}
 
-		mBillingController = SurespotApplication.getBillingController();
+		BillingController mBillingController = SurespotApplication.getBillingController();
 
 		showProgress();
-		mBillingController.setup(getApplicationContext(), false, mBillingResponseHandler);
 
 	}
 
@@ -70,29 +67,6 @@ public class BillingActivity extends SherlockFragmentActivity {
 		setProgress(false);
 	}
 
-	public void onPurchase(View arg0) {
-		String denom = (String) arg0.getTag();
-		// try {
-		showProgress();
-		// we don't care about purcases on this screen so don't query
-		mBillingController.purchase(this, SurespotConstants.Products.PWYL_PREFIX + denom, false, mBillingResponseHandler);
-	}
-
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		SurespotLog.d(TAG, "onActivityResult(%s, $s, $s)", requestCode, resultCode, data);
-
-		// Pass on the activity result to the helper for handling
-		if (!mBillingController.getIabHelper().handleActivityResult(requestCode, resultCode, data)) {
-			// not handled, so handle it ourselves (here's where you'd
-			// perform any handling of activity results not related to in-app
-			// billing...
-			super.onActivityResult(requestCode, resultCode, data);
-		}
-		else {
-			SurespotLog.d(TAG, "onActivityResult handled by IABUtil.");
-		}
-	}
 
 	private Uri getPayPalUri() {
 		Uri.Builder uriBuilder = new Uri.Builder();
@@ -167,7 +141,10 @@ public class BillingActivity extends SherlockFragmentActivity {
 		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 
 		String bitcoinAddy = Utils.getResourceString(this, "donations__bitcoin");
-		clipboard.setText(bitcoinAddy);
+
+        ClipData clip = ClipData.newPlainText("Bitcoin Address", bitcoinAddy);
+        clipboard.setPrimaryClip(clip);
+
 		Utils.makeToast(this, getString(R.string.billing_bitcoin_copied_to_clipboard, bitcoinAddy));
 
 	}
@@ -175,6 +152,8 @@ public class BillingActivity extends SherlockFragmentActivity {
 	public void onBitcoinEmail(View arg0) {
 
 		String bitcoinAddy = Utils.getResourceString(this, "donations__bitcoin");
+
+
 
 		SurespotLog.d(TAG, "sending email with bitcoin");
 

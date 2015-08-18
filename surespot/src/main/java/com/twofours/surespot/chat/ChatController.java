@@ -720,61 +720,6 @@ public class ChatController {
 								}
 							}
 						}
-						else {
-							if (message.getMimeType().equals(SurespotConstants.MimeTypes.M4A)) {
-								if (ChatUtils.isMyMessage(message)) {
-									handleCachedFile(chatAdapter, message);
-								}
-								else {
-
-									InputStream encryptedVoiceStream = MainActivity.getNetworkController().getFileStream(MainActivity.getContext(),
-											message.getData());
-
-									PipedOutputStream out = new PipedOutputStream();
-									PipedInputStream inputStream = null;
-									try {
-										inputStream = new PipedInputStream(out);
-
-										EncryptionController.runDecryptTask(message.getOurVersion(), message.getOtherUser(), message.getTheirVersion(),
-												message.getIv(), new BufferedInputStream(encryptedVoiceStream), out);
-
-										byte[] bytes = Utils.inputStreamToBytes(inputStream);
-										message.setPlainBinaryData(bytes);
-									}
-									catch (InterruptedIOException ioe) {
-
-										SurespotLog.w(TAG, ioe, "handleMessage");
-
-									}
-									catch (IOException e) {
-										SurespotLog.w(TAG, e, "handleMessage");
-									}
-									finally {
-
-										try {
-											if (inputStream != null) {
-												inputStream.close();
-											}
-										}
-										catch (IOException e) {
-											SurespotLog.w(TAG, e, "handleMessage");
-										}
-
-										try {
-											if (encryptedVoiceStream != null) {
-												encryptedVoiceStream.close();
-											}
-										}
-										catch (IOException e) {
-											SurespotLog.w(TAG, e, "handleMessage");
-										}
-									}
-								}
-							}
-							else {
-								message.setPlainData("unknown message mime type");
-							}
-						}
 					}
 					return null;
 				}
@@ -795,12 +740,6 @@ public class ChatController {
 							if (otherUser.equals(mCurrentChat)) {
 
 								friend.setLastViewedMessageId(messageId);
-
-								// if it was a voice message from the other user set play flag
-								// TODO wrap in preference
-								if (!ChatUtils.isMyMessage(message) && message.getMimeType().equals(SurespotConstants.MimeTypes.M4A)) {
-									message.setPlayMedia(true);
-								}
 
 							}
 							// chat not showing
@@ -2087,70 +2026,6 @@ public class ChatController {
 
 	}
 
-	public void sendVoiceMessage(final String username, final byte[] plainData, final String mimeType) {
-		if (plainData.length > 0) {
-			final ChatAdapter chatAdapter = mChatAdapters.get(username);
-			if (chatAdapter == null) {
-				return;
-			}
-			// display the message immediately
-			final byte[] iv = EncryptionController.getIv();
-
-			// build a message without the encryption values set as they could take a while
-
-			final SurespotMessage chatMessage = ChatUtils.buildPlainBinaryMessage(username, mimeType, plainData, new String(ChatUtils.base64EncodeNowrap(iv)));
-
-			try {
-
-				chatAdapter.addOrUpdateMessage(chatMessage, false, true, true);
-				enqueueMessage(chatMessage);
-			}
-			catch (SurespotMessageSequenceException e) {
-				// not gonna happen
-				SurespotLog.w(TAG, e, "sendMessage");
-			}
-
-			// do encryption in background
-			new AsyncTask<Void, Void, Boolean>() {
-
-				@Override
-				protected Boolean doInBackground(Void... arg0) {
-					String ourLatestVersion = IdentityController.getOurLatestVersion();
-					String theirLatestVersion = IdentityController.getTheirLatestVersion(username);
-
-					byte[] result = EncryptionController.symmetricEncrypt(ourLatestVersion, username, theirLatestVersion, plainData, iv);
-
-					if (result != null) {
-
-						// set data for sending
-						chatMessage.setData(new String(ChatUtils.base64EncodeNowrap(result)));
-						chatMessage.setFromVersion(ourLatestVersion);
-						chatMessage.setToVersion(theirLatestVersion);
-
-						SurespotLog.d(TAG, "sending message to chat controller iv: %s", chatMessage.getIv());
-						sendMessages();
-						return true;
-					}
-					else {
-						SurespotLog.d(TAG, "could not encrypt message, iv: %s", chatMessage.getIv());
-						chatMessage.setErrorStatus(500);
-
-						return false;
-					}
-				}
-
-				protected void onPostExecute(Boolean success) {
-					// if success is false we will have set an error status in the message so notify
-					if (!success) {
-						chatAdapter.notifyDataSetChanged();
-					}
-				};
-
-			}.execute();
-		}
-
-	}
-
 	void addMessage(Activity activity, SurespotMessage message) {
 		if (mChatAdapters != null) {
 			ChatAdapter chatAdapter = mChatAdapters.get(message.getTo());
@@ -2532,27 +2407,6 @@ public class ChatController {
 		boolean isDeleted = false;
 		if (friend != null) {
 			isDeleted = friend.isDeleted();
-		}
-
-		if (mMenuItems != null) {
-			for (MenuItem menuItem : mMenuItems) {
-				if (menuItem.getItemId() != R.id.menu_purchase_voice) {
-
-					// deleted users can't have images sent to them
-					if (menuItem.getItemId() == R.id.menu_capture_image_bar || menuItem.getItemId() == R.id.menu_send_image_bar) {
-
-						menuItem.setVisible(enabled && !isDeleted);
-					}
-					else {
-						menuItem.setVisible(enabled);
-					}
-				}
-				else {
-					boolean voiceEnabled = SurespotApplication.getBillingController().hasVoiceMessaging();
-					SurespotLog.d(TAG, "enableMenuItems, setting voice purchase menu visibility: %b", !voiceEnabled);
-					menuItem.setVisible(!voiceEnabled);
-				}
-			}
 		}
 	}
 

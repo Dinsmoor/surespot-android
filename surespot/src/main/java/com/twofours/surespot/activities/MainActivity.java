@@ -64,7 +64,6 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.twofours.surespot.R;
 import com.twofours.surespot.SurespotApplication;
 import com.twofours.surespot.billing.BillingActivity;
-import com.twofours.surespot.billing.BillingController;
 import com.twofours.surespot.chat.ChatController;
 import com.twofours.surespot.chat.ChatUtils;
 import com.twofours.surespot.chat.EmojiAdapter;
@@ -90,8 +89,6 @@ import com.twofours.surespot.services.CredentialCachingService;
 import com.twofours.surespot.services.CredentialCachingService.CredentialCachingBinder;
 import com.twofours.surespot.ui.LetterOrDigitInputFilter;
 import com.twofours.surespot.ui.UIUtils;
-import com.twofours.surespot.voice.VoiceController;
-import com.twofours.surespot.voice.VoicePurchaseFragment;
 import com.viewpagerindicator.TitlePageIndicator;
 
 public class MainActivity extends SherlockFragmentActivity implements OnMeasureListener {
@@ -132,7 +129,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnMeasureL
 	private boolean mFriendHasBeenSet;
 	private int mEmojiResourceId = -1;
 	private ImageView mIvInvite;
-	private ImageView mIvVoice;
 	private ImageView mIvSend;
 	private ImageView mIvHome;
 	private AlertDialog mHelpDialog;
@@ -142,8 +138,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnMeasureL
 	private boolean mResumed;
 	private boolean mUnlocking = false;
 	private boolean mPaused = false;
-
-	private BillingController mBillingController;
 
 	@Override
 	protected void onNewIntent(Intent intent) {
@@ -320,11 +314,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnMeasureL
 		finish();
 	}
 
-	private void setupBilling() {
-		mBillingController = SurespotApplication.getBillingController();
-		mBillingController.setup(getApplicationContext(), true, null);
-	}
-
 	private AutoInviteData getAutoInviteData(Intent intent) {
 		Uri uri = intent.getData();
 		boolean dataUri = true;
@@ -395,7 +384,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnMeasureL
 
 	private void setupChatControls() {
 		mIvInvite = (ImageView) findViewById(R.id.ivInvite);
-		mIvVoice = (ImageView) findViewById(R.id.ivVoice);
 		mIvSend = (ImageView) findViewById(R.id.ivSend);
 		mIvHome = (ImageView) findViewById(R.id.ivHome);
 		mSendButton = (View) findViewById(R.id.bSend);
@@ -410,119 +398,13 @@ public class MainActivity extends SherlockFragmentActivity implements OnMeasureL
 
 						if (mEtMessage.getText().toString().length() > 0 && !mChatController.isFriendDeleted(friend.getName())) {
 							sendMessage(friend.getName());
-						}
-						else {
-
+						} else {
 							SharedPreferences sp = MainActivity.this.getSharedPreferences(mUser, Context.MODE_PRIVATE);
-							boolean dontAskDontTell = sp.getBoolean("pref_suppress_voice_purchase_ask", false);
-
-							// if they have purchased voice or don't want to be bugged anymore or the user they are on is deleted
-							if (mBillingController.hasVoiceMessaging() || dontAskDontTell || mChatController.isFriendDeleted(friend.getName())) {
-								// go to home
-								mChatController.setCurrentChat(null);
-							}
-							else {
-								// nag nag nag
-								showVoicePurchaseDialog(true);
-							}
 						}
-					}
-					else {
+					} else {
 						inviteFriend();
 					}
 				}
-			}
-		});
-
-		mSendButton.setOnLongClickListener(new OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View v) {
-				//
-				SurespotLog.d(TAG, "onLongClick voice");
-				Friend friend = mCurrentFriend;
-				if (friend != null) {
-					// if they're deleted always close the tab
-					if (mChatController.isFriendDeleted(friend.getName())) {
-						mChatController.closeTab();
-					}
-					else {
-						if (mEtMessage.getText().toString().length() > 0) {
-							sendMessage(friend.getName());
-						}
-						else {
-							if (mBillingController.hasVoiceMessaging()) {
-								VoiceController.startRecording(MainActivity.this, friend.getName());
-							}
-							else {
-								//
-								SharedPreferences sp = MainActivity.this.getSharedPreferences(mUser, Context.MODE_PRIVATE);
-								boolean dontAskDontTell = sp.getBoolean("pref_suppress_voice_purchase_ask", false);
-								if (dontAskDontTell) {
-									mChatController.closeTab();
-								}
-								else {
-									showVoicePurchaseDialog(true);
-								}
-							}
-						}
-					}
-				}
-
-				return true;
-			}
-		});
-
-		mSendButton.setOnTouchListener(new OnTouchListener() {
-
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-
-				if (event.getAction() == MotionEvent.ACTION_UP) {
-					if (VoiceController.isRecording()) {
-
-						Friend friend = mCurrentFriend;
-						if (friend != null) {
-							// if they're deleted do nothing
-							if (mChatController.isFriendDeleted(friend.getName())) {
-								return false;
-							}
-
-							if (mEtMessage.getText().toString().length() == 0) {
-
-								int width = mSendButton.getWidth();
-
-								// if user let go of send button out of send button + width (height) bounds, don't send the recording
-								Rect rect = new Rect(mSendButton.getLeft() - width, mSendButton.getTop() - width, mSendButton.getRight(), mSendButton
-										.getBottom() + width);
-
-								boolean send = true;
-								if (!rect.contains(v.getLeft() + (int) event.getX(), v.getTop() + (int) event.getY())) {
-
-									send = false;
-
-									Utils.makeToast(MainActivity.this, getString(R.string.recording_cancelled));
-
-								}
-
-								final boolean finalSend = send;
-
-								SurespotLog.d(TAG, "voice record up");
-
-								// truncates without the delay for some reason
-								mSendButton.post(new Runnable() {
-
-									@Override
-									public void run() {
-										VoiceController.stopRecording(MainActivity.this, finalSend);
-
-									}
-								});
-							}
-						}
-					}
-				}
-
-				return false;
 			}
 		});
 
@@ -713,7 +595,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnMeasureL
 			return;
 		}
 
-		setupBilling();
+
 
 		// set volume control buttons
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
@@ -742,7 +624,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnMeasureL
 			return;
 		}
 
-		mBillingController = SurespotApplication.getBillingController();
 
 		mChatController = new ChatController(MainActivity.this, mUser, mNetworkController, getSupportFragmentManager(), m401Handler,
 				new IAsyncCallback<Boolean>() {
@@ -918,12 +799,10 @@ public class MainActivity extends SherlockFragmentActivity implements OnMeasureL
 			mChatController.onPause();
 		}
 
-		VoiceController.pause();
+
 		stopWatchingExternalStorage();
-		BillingController bc = SurespotApplication.getBillingController();
-		if (bc != null) {
-			bc.dispose();
-		}
+
+
 
 		if (mHelpDialog != null && mHelpDialog.isShowing()) {
 			mHelpDialog.dismiss();
@@ -1021,15 +900,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnMeasureL
 			}
 			break;
 
-		case SurespotConstants.IntentRequestCodes.PURCHASE:
-			// Pass on the activity result to the helper for handling
-			if (!SurespotApplication.getBillingController().getIabHelper().handleActivityResult(requestCode, resultCode, data)) {
-				super.onActivityResult(requestCode, resultCode, data);
-			}
-			else {
-				// TODO upload token to server
-				SurespotLog.d(TAG, "onActivityResult handled by IABUtil.");
-			}
 		default:
 			super.onActivityResult(requestCode, resultCode, data);
 		}
@@ -1061,7 +931,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnMeasureL
 		mMenuItems.add(menu.findItem(R.id.menu_clear_messages));
 		// nag nag nag
 
-		mMenuItems.add(menu.findItem(R.id.menu_purchase_voice));
 
 		if (mChatController != null) {
 			mChatController.enableMenuItems(mCurrentFriend);
@@ -1217,9 +1086,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnMeasureL
 				}
 			}.execute();
 			return true;
-		case R.id.menu_purchase_voice:
-			showVoicePurchaseDialog(false);
-			return true;
 		default:
 			return false;
 
@@ -1342,12 +1208,6 @@ public class MainActivity extends SherlockFragmentActivity implements OnMeasureL
 
 		SurespotLog.d(TAG, "onSaveInstanceState saving mKeyboardShowing: %b", mKeyboardShowing);
 		outState.putBoolean("keyboardShowing", mKeyboardShowing);
-
-		SurespotLog.d(TAG, "onSaveInstanceState saving emoji showing: %b", mEmojiShowing);
-		outState.putBoolean("emojiShowing", mEmojiShowing);
-
-		SurespotLog.d(TAG, "onSaveInstanceState saving emoji showing on chat tab: %b", mEmojiShowing);
-		outState.putBoolean("emojiShowingChat", mEmojiShowing);
 
 		SurespotLog.d(TAG, "onSaveInstanceState saving keyboard showing in chat tab: %b", mKeyboardShowingOnChatTab);
 		outState.putBoolean("keyboardShowingChat", mKeyboardShowingOnChatTab);
@@ -1768,39 +1628,24 @@ public class MainActivity extends SherlockFragmentActivity implements OnMeasureL
 	public void setButtonText() {
 		if (mCurrentFriend == null) {
 			mIvInvite.setVisibility(View.VISIBLE);
-			mIvVoice.setVisibility(View.GONE);
 			mIvHome.setVisibility(View.GONE);
 			mIvSend.setVisibility(View.GONE);
 		}
 		else {
 			if (mCurrentFriend.isDeleted()) {
 				mIvInvite.setVisibility(View.GONE);
-				mIvVoice.setVisibility(View.GONE);
 				mIvHome.setVisibility(View.VISIBLE);
 				mIvSend.setVisibility(View.GONE);
 			}
 			else {
 				if (mEtMessage.getText().length() > 0) {
 					mIvInvite.setVisibility(View.GONE);
-					mIvVoice.setVisibility(View.GONE);
 					mIvHome.setVisibility(View.GONE);
 					mIvSend.setVisibility(View.VISIBLE);
 				}
 				else {
 					mIvInvite.setVisibility(View.GONE);
-					SharedPreferences sp = getSharedPreferences(mUser, Context.MODE_PRIVATE);
-					boolean dontAsk = sp.getBoolean("pref_suppress_voice_purchase_ask", false);
-
-					if (dontAsk) {
-						mIvVoice.setVisibility(View.GONE);
-						mIvHome.setVisibility(View.VISIBLE);
-					}
-					else {
-						mIvVoice.setVisibility(View.VISIBLE);
-						mIvHome.setVisibility(View.GONE);
-					}
-
-					mIvSend.setVisibility(View.GONE);
+					mIvSend.setVisibility(View.VISIBLE);
 				}
 			}
 
@@ -1958,12 +1803,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnMeasureL
 
 	}
 
-	public void showVoicePurchaseDialog(boolean comingFromButton) {
-		FragmentManager fm = getSupportFragmentManager();
-		SherlockDialogFragment dialog = VoicePurchaseFragment.newInstance(comingFromButton);
-		dialog.show(fm, "voice_purchase");
 
-	}
 
 	@Override
 	public void onLowMemory() {

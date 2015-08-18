@@ -183,7 +183,7 @@ public class NetworkController {
 		}
 		params.put("version", SurespotApplication.getVersion());
 		params.put("platform", "android");
-		addVoiceMessagingPurchaseTokens(params);
+
 
 		// get the gcm id
 		final String gcmIdReceived = Utils.getSharedPrefsString(mContext, SurespotConstants.PrefNames.GCM_ID_RECEIVED);
@@ -328,7 +328,7 @@ public class NetworkController {
 		params.put("version", SurespotApplication.getVersion());
 		params.put("platform", "android");
 
-		addVoiceMessagingPurchaseTokens(params);
+
 
 		// get the gcm id
 		final String gcmIdReceived = Utils.getSharedPrefsString(mContext, SurespotConstants.PrefNames.GCM_ID_RECEIVED);
@@ -394,22 +394,6 @@ public class NetworkController {
 
 	}
 
-	private void addVoiceMessagingPurchaseTokens(Map<String, String> params) {
-		String voiceMessagingPurchaseToken = SurespotApplication.getBillingController().getVoiceMessagingPurchaseToken();
-		if (params != null && !TextUtils.isEmpty(voiceMessagingPurchaseToken)) {
-			SurespotLog.d(TAG,"adding voice messaging purchase tokens");
-			// build purchase token json object string
-			JSONObject jPurchaseTokens = new JSONObject();
-			try {
-				jPurchaseTokens.put(SurespotConstants.Products.VOICE_MESSAGING, voiceMessagingPurchaseToken);
-				params.put("purchaseTokens", jPurchaseTokens.toString());
-			}
-			catch (JSONException e) {
-				SurespotLog.w(TAG, e, "json error creating purchase token object");
-			}
-		}
-
-	}
 
 	public void getFriends(AsyncHttpResponseHandler responseHandler) {
 		get("/friends", null, responseHandler);
@@ -427,9 +411,7 @@ public class NetworkController {
 		SurespotLog.d(TAG, "getLatestData userControlId: %d", userControlId);
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("spotIds", spotIds.toString());
-		
-		//update voice tokens, we may have just switched user
-		addVoiceMessagingPurchaseTokens(params);
+
 
 		post("/optdata/" + userControlId, new RequestParams(params), responseHandler);
 	}
@@ -765,12 +747,6 @@ public class NetworkController {
 	public void removeCacheEntry(String key) {
 		mCachingHttpClient.removeEntry(key);
 
-	}
-
-	public void updateVoiceMessagingPurchaseToken(final AsyncHttpResponseHandler responseHandler) {
-		Map<String, String> params = new HashMap<String, String>();
-		addVoiceMessagingPurchaseTokens(params);
-		post("/updatePurchaseTokens", new RequestParams(params), responseHandler);
 	}
 	
 	public void assignFriendAlias(String username, String version, String data, String iv, AsyncHttpResponseHandler responseHandler) {

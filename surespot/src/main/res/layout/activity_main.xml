@@ -116,14 +116,6 @@
         </ImageView>
 
         <ImageView
-            android:id="@+id/ivVoice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_btn_speak_now" >
-        </ImageView>
-
-        <ImageView
             android:id="@+id/ivHome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -154,45 +146,5 @@
         android:verticalSpacing="10dp"
         android:visibility="gone" >
     </GridView>
-
-    <RelativeLayout
-        android:id="@+id/voiceHeader"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:orientation="vertical"
-        android:visibility="gone" >
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#88000000" >
-
-            <com.twofours.surespot.voice.VolumeEnvelopeView
-                android:id="@+id/volume_envelope"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_gravity="center"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:background="#BB000000"
-                android:visibility="gone"
-                app:color="@color/surespotBlue" />
-        </FrameLayout>
-
-        <TextView
-            android:id="@+id/voiceRecTimeLeft"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="5dp"
-            android:background="@drawable/transparent_blue_circle"
-            android:gravity="center"
-            android:textColor="@android:color/white"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-    </RelativeLayout>
 
 </com.twofours.surespot.chat.MainActivityLayout>

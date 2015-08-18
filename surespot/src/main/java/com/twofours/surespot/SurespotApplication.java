@@ -160,8 +160,7 @@ public class SurespotApplication extends MultiDexApplication {
 		Intent cacheIntent = new Intent(this, CredentialCachingService.class);
 
 		startService(cacheIntent);
-		mBillingController = new BillingController(this);
-						
+
 		FileUtils.wipeImageCaptureDir(this);
 	}
 

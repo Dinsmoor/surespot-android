@@ -15,7 +15,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SeekBar;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.actionbarsherlock.app.SherlockFragment;
@@ -28,8 +27,7 @@ import com.twofours.surespot.images.ImageMessageMenuFragment;
 import com.twofours.surespot.images.ImageViewActivity;
 import com.twofours.surespot.images.MessageImageDownloader;
 import com.twofours.surespot.network.IAsyncCallback;
-import com.twofours.surespot.voice.VoiceController;
-import com.twofours.surespot.voice.VoiceMessageMenuFragment;
+
 
 public class ChatFragment extends SherlockFragment {
 	private String TAG = "ChatFragment";
@@ -103,12 +101,6 @@ public class ChatFragment extends SherlockFragment {
 							ChatFragment.this.getActivity().startActivity(newIntent);
 						}
 					}
-					else {
-						if (message.getMimeType().equals(SurespotConstants.MimeTypes.M4A)) {
-							SeekBar seekBar = (SeekBar) view.findViewById(R.id.seekBarVoice);
-							VoiceController.playVoiceMessage(ChatFragment.this.getActivity(), seekBar, message);
-						}
-					}
 				}
 			}
 		});
@@ -131,13 +123,7 @@ public class ChatFragment extends SherlockFragment {
 						dialog.show(getActivity().getSupportFragmentManager(), "ImageMessageMenuFragment");
 						return true;
 					}
-					else {
-						if (message.getMimeType().equals(SurespotConstants.MimeTypes.M4A)) {
-							SherlockDialogFragment dialog = VoiceMessageMenuFragment.newInstance(message);
-							dialog.show(getActivity().getSupportFragmentManager(), "VoiceMessageMenuFragment");
-							return true;
-						}
-					}
+
 				}
 				return false;
 			}
