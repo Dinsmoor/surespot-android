@@ -78,7 +78,7 @@
     <string name="help_backup_local">"For maximum security we recommend using Device Storage backup. Once backed up, the identity file should then be copied (or moved) from your device to a secure location so that it may be restored in the case of app uninstall or 'clear data', a lost or stolen device, or other data loss."</string>
     <string name="help_backup_drive1"><![CDATA["If you elect to backup your identity on Google Drive you will be storing a copy of your <a href="https://en.wikipedia.org/wiki/Public-key_cryptography">private keys</a> on Google Drive servers. Should a third party somehow gain access to the Google Drive servers and attempt to decrypt your identity file by <a href="https://en.wikipedia.org/wiki/Brute-force_attack">brute force attack</a>, be aware that the <a href="https://en.wikipedia.org/wiki/Password_strength">strength</a> of your password will ultimately determine their success."]]></string>
     <string name="help_backup_drive2">"Your identities will be stored on Google Drive in the folder 'surespot identity backups'. Identities can be restored from the create user screen or in identity management settings."</string>
-    <string name="pwyl_text"><![CDATA["Surespot is ad and data mining free.<br><br>Servers and storage cost money; your donations ensure that we do not have to charge for surespot.<br><br>We will donate a percentage to the <a href="https://www.eff.org/issues/privacy">EFF</a> that they may continue to fight for all of our electronic freedoms."]]></string>
+    <string name="pwyl_text">Surespot is ad and data mining free. Servers and storage cost money; your donations ensure that we do not have to charge for surespot. We will donate a percentage to the EFF that they may continue to fight for all of our electronic freedoms.</string>
     <string name="help_messageHistory">Surespot has a 1000 message history. Once you reach 1000 messages your oldest message will be deleted so you will only ever have 1000 (encrypted) messages stored on the server. Of course you can delete any and all of your messages at any time.</string>
     <string name="title_activity_about">about surespot</string>
     <string name="about_about"><![CDATA["surespot - a 2fours production"]]></string>
@@ -210,12 +210,11 @@
     <string name="via_google_play_in_app_purchase">VIA IN APP PURCHASE</string>
     <string name="via_paypal">VIA PAYPAL</string>
     <string name="pwyl_send_to_dialog_title">send to?</string>
-    <string name="open_link_in_browser">open link in browser</string>
+    <string name="open_link_in_browser">Via PayPal</string>
     <string name="send_link_in_email">email link to yourself</string>
-    <string name="via_bitcoin">VIA BITCOIN</string>
     <string name="copy_address_to_clipboard">copy address to clipboard</string>
     <string name="send_address_and_qr_code_in_email">email yourself address and QR code</string>
-    <string name="open_bitcoin_wallet">open bitcoin wallet (if supported)</string>
+    <string name="open_bitcoin_wallet">Open wallet</string>
     <string name="select_identity">select identity</string>
     <string name="current_password">current password</string>
     <string name="new_password">new password</string>
@@ -232,7 +231,7 @@
     <string name="options">options</string>
     <string name="clear_local_cache">clear local cache</string>
     <string name="delete_all_messages">delete all messages</string>
-    <string name="pay_what_you_like">pay what you like</string>
+    <string name="donation">Donation</string>
     <string name="pref_title_general">general</string>
     <string name="pref_title_about_surespot">about surespot</string>
     <string name="pref_title_help">help</string>
@@ -320,11 +319,12 @@
     <string name="pref_title_background_image_remove">remove background image</string>
     <string name="error_surespot_could_not_create_http_clients">surespot could not create http clients..is storage space available? Shutting down.</string>
     <string name="menu_copy">copy</string>
+    <string name="via_bitcoin">Copy address</string>
     <string name="message_hint">enter message</string>
     <string name="invite_hint">invite user</string>
     <string name="recording_cancelled">recording cancelled</string>
-    <string name="share_invite_link">share invite link</string>
-    <string name="share_link_help">"Use the 'share invite link' menu option to share a link via email, sms, twitter, or other social media, that when clicked will install surespot / invite you as a friend in surespot"</string>
+    <string name="share_invite_link">Invite others</string>
+    <string name="share_link_help">"Use the 'Invite Others' menu option to share a link via email, sms, twitter, or other social media, that when clicked will install surespot / invite you as a friend in surespot"</string>
     <string name="pref_stop_cache_logout_title">kill cache on logout</string>
     <string name="pref_stop_cache_logout_summary">kills the cache service on logout</string>
     <string name="could_not_load_public_keys">could not load public keys</string>
@@ -348,4 +348,7 @@
     <string name="notification_invite_accept_no_from">%s: Friend invite accepted.</string>
     <string name="whats_new_57_message">New features!\n\nSave password in keychain.\n\nFriend aliases (long press on friend name on home tab).\n\nImproved reconnect handling.\n\nThank you for funding this project through your donations!</string>
     <string name="whats_new_57_title">Version 58</string>
+    <string name="title_activity_donation">DonationActivity</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>

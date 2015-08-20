@@ -1,11 +1,5 @@
 package com.twofours.surespot.activities;
 
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -19,7 +13,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Rect;
 import android.hardware.Camera;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -29,7 +22,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.ResultReceiver;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -39,7 +31,6 @@ import android.text.method.TextKeyListener;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.WindowManager;
@@ -53,9 +44,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import ch.boye.httpclientandroidlib.client.HttpResponseException;
 
-import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -63,7 +52,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.twofours.surespot.R;
 import com.twofours.surespot.SurespotApplication;
-import com.twofours.surespot.billing.BillingActivity;
+import com.twofours.surespot.billing.DonationActivity;
 import com.twofours.surespot.chat.ChatController;
 import com.twofours.surespot.chat.ChatUtils;
 import com.twofours.surespot.chat.EmojiAdapter;
@@ -90,6 +79,14 @@ import com.twofours.surespot.services.CredentialCachingService.CredentialCaching
 import com.twofours.surespot.ui.LetterOrDigitInputFilter;
 import com.twofours.surespot.ui.UIUtils;
 import com.viewpagerindicator.TitlePageIndicator;
+
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+
+import ch.boye.httpclientandroidlib.client.HttpResponseException;
 
 public class MainActivity extends SherlockFragmentActivity implements OnMeasureListener {
 	public static final String TAG = "MainActivity";
@@ -138,6 +135,8 @@ public class MainActivity extends SherlockFragmentActivity implements OnMeasureL
 	private boolean mResumed;
 	private boolean mUnlocking = false;
 	private boolean mPaused = false;
+
+	private DonationActivity mdonateActivity;
 
 	@Override
 	protected void onNewIntent(Intent intent) {
@@ -1080,7 +1079,7 @@ public class MainActivity extends SherlockFragmentActivity implements OnMeasureL
 			new AsyncTask<Void, Void, Void>() {
 				protected Void doInBackground(Void... params) {
 
-					Intent intent = new Intent(MainActivity.this, BillingActivity.class);
+					Intent intent = new Intent(MainActivity.this, DonationActivity.class);
 					startActivity(intent);
 					return null;
 				}

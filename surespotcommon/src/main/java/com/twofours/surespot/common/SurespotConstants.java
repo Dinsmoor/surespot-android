@@ -95,8 +95,6 @@ public class SurespotConstants {
 		public final static int PICK_CONTACT = 9;
 		public final static int REQUEST_SELECT_FRIEND_IMAGE = 10;
 		public final static int BACKUP_NOTIFICATION = 11;
-		public final static int CHOOSE_GOOGLE_ACCOUNT = 12;
-		public final static int REQUEST_GOOGLE_AUTH = 13;
 		public final static int SYSTEM_NOTIFICATION = 14;
 		public final static int PURCHASE = 15;
 		public final static int BACKGROUND_CACHE_NOTIFICATION = 16;
@@ -105,6 +103,5 @@ public class SurespotConstants {
 	
 	public class Products {
 		public final static String PWYL_PREFIX = "pwyl_";
-		public final static String VOICE_MESSAGING = "voice_messaging";
 	}
 }

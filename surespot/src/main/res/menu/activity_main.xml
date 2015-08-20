@@ -28,12 +28,10 @@
                 android:icon="@drawable/blue_heart"
                 android:title="@string/share_invite_link"/>
 
-            <!-- I told you before kid, paywhatyoulike -->
-
             <item
                 android:id="@+id/menu_pwyl"
                 android:icon="@drawable/heart"
-                android:title="@string/pay_what_you_like">
+                android:title="@string/donation">
             </item>
             <item
                 android:id="@+id/menu_settings_bar"
